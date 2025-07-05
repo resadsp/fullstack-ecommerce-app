@@ -7,7 +7,7 @@ const handleImageError = (e) => {
     e.target.src = 'https://via.placeholder.com/400x300/cccccc/666666?text=Slika+nije+dostupna';
 };
 
-const Products = () => {
+const Products = ({ onLogout }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -16,7 +16,8 @@ const Products = () => {
         search: ''
     });
     const [categories, setCategories] = useState([]);
-    
+    const [showLogoutMessage, setShowLogoutMessage] = useState(false); // ✅ Dodano za poruku
+       
     const navigate = useNavigate();
 
     // Dobijanje proizvoda
@@ -24,18 +25,18 @@ const Products = () => {
         try {
             setLoading(true);
             setError(null);
-            
+                       
             const data = await api.getProducts(filters);
             setProducts(data);
-            
+                       
             // Izvlačenje jedinstvenih kategorija
             const uniqueCategories = [...new Set(data.map(product => product.category))];
             setCategories(uniqueCategories);
-            
+                   
         } catch (err) {
             console.error('Error fetching products:', err);
             setError(err.message);
-            
+                       
             // Ako je problem sa autentifikacijom, preusmeri na login
             if (err.message.includes('authentication') || err.message.includes('401')) {
                 localStorage.removeItem('token');
@@ -46,12 +47,35 @@ const Products = () => {
         }
     };
 
+    const handleLogout = () => {
+        console.log('🚪 Logout clicked in Products component');
+        
+        // ✅ Prikaži poruku za odjavu
+        setShowLogoutMessage(true);
+        
+        // ✅ Sakrij poruku i izvrši logout nakon 2 sekunde
+        setTimeout(() => {
+            // Obriši token direktno ovde takođe (kao backup)
+            localStorage.removeItem('token');
+            localStorage.removeItem('tokenType');
+            
+            // Pozovi onLogout callback da obavestiš App komponentu
+            if (onLogout) {
+                console.log('📞 Calling onLogout callback');
+                onLogout();
+            } else {
+                console.warn('⚠️ onLogout callback not provided');
+                // Fallback: direktna navigacija
+                navigate('/login', { replace: true });
+            }
+        }, 2000);
+    };
+
     // Učitaj proizvode kada se komponenta mount-uje ili se filtri promene
     useEffect(() => {
         fetchProducts();
     }, [filters]);
-
-    
+       
     // Handler za promenu kategorije
     const handleCategoryChange = (e) => {
         setFilters(prev => ({
@@ -73,15 +97,9 @@ const Products = () => {
         const timeoutId = setTimeout(() => {
             // Ovde možete dodati dodatnu logiku ako je potrebno
         }, 300);
-        
+               
         return () => clearTimeout(timeoutId);
     }, [filters.search]);
-
-    // Logout funkcija
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
-    };
 
     // Klik na proizvod
     const handleProductClick = (productId) => {
@@ -111,21 +129,40 @@ const Products = () => {
 
     return (
         <div className="products-container">
+            {/* ✅ Logout poruka overlay */}
+            {showLogoutMessage && (
+                <div className="logout-message-overlay">
+                    <div className="logout-message">
+                        <h2>👋 Hvala vam!</h2>
+                        <p>Dođite opet uskoro!</p>
+                        <p>Vidimo se! 😊</p>
+                        <div className="logout-spinner"></div>
+                    </div>
+                </div>
+            )}
+
             {/* Header sa logout */}
             <div className="products-header">
                 <h1>Proizvodi</h1>
-                <button onClick={handleLogout} className="logout-btn">
-                    Odjavi se
-                </button>
+                <div className="header-actions">
+                    <div className="user-menu">
+                        <span className="user-greeting">
+                            Dobrodošli!
+                        </span>
+                        <button onClick={handleLogout} className="logout-btn">
+                            🚪 Odjavi se
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Filtri */}
             <div className="filters-section">
                 <div className="filter-group">
                     <label htmlFor="category">Kategorija:</label>
-                    <select 
+                    <select
                         id="category"
-                        value={filters.category} 
+                        value={filters.category}
                         onChange={handleCategoryChange}
                         className="filter-select"
                     >
@@ -137,7 +174,6 @@ const Products = () => {
                         ))}
                     </select>
                 </div>
-
                 <div className="filter-group">
                     <label htmlFor="search">Pretraga:</label>
                     <input
@@ -166,13 +202,13 @@ const Products = () => {
                     </div>
                 ) : (
                     products.map(product => (
-                        <div 
-                            key={product.id} 
+                        <div
+                            key={product.id}
                             className="product-card"
                             onClick={() => handleProductClick(product.id)}
                         >
-                            <img 
-                                src={product.image_url} 
+                            <img
+                                src={product.image_url}
                                 alt={product.name}
                                 className="product-image"
                                 onError={handleImageError}
@@ -198,7 +234,5 @@ const Products = () => {
         </div>
     );
 };
-
-
 
 export default Products;

@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../services/api'; // ✅ Ispravljen import
+import { api } from '../services/api';
 import './Login.css';
 
-const Login = () => {
+const Login = ({ onLogin }) => { // ✅ Dodaj onLogin prop
     const [credentials, setCredentials] = useState({
         username: '',
         password: ''
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState(false);
     
     const navigate = useNavigate();
 
@@ -17,16 +18,28 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         setError('');
+        setSuccess(false);
 
         try {
-            const response = await api.login(credentials); // ✅ Koristi api.login
+            console.log('Pokušavam login...'); 
+            const response = await api.login(credentials);
+            console.log('Login response:', response); 
             
             // Sačuvaj token
             localStorage.setItem('token', response.access_token);
+            console.log('Token saved:', response.access_token); 
             
-            // Preusmeri na products
-            navigate('/products');
+            // ✅ KLJUČNO: Pozovi onLogin callback da obavestiš App komponentu
+            if (onLogin) {
+                onLogin(response);
+            }
             
+            // Postavi success state
+            setSuccess(true);
+            
+            // Navigacija će se desiti automatski jer će App.js promeniti isAuthenticated
+            console.log('Login successful, App will handle navigation');
+                       
         } catch (err) {
             console.error('Login error:', err);
             setError('Neispravni kredencijali. Pokušajte ponovo.');
@@ -50,6 +63,12 @@ const Login = () => {
                 {error && (
                     <div className="error-message">
                         {error}
+                    </div>
+                )}
+                
+                {success && (
+                    <div className="success-message">
+                        Uspešno ste se prijavili! Preusmeravamo vas...
                     </div>
                 )}
                 
@@ -80,20 +99,14 @@ const Login = () => {
                         />
                     </div>
                     
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="login-btn"
                         disabled={loading}
                     >
                         {loading ? 'Prijavljivanje...' : 'Prijavite se'}
                     </button>
                 </form>
-                
-                <div className="test-credentials">
-                    <p><strong>Test kredencijali:</strong></p>
-                    <p>Username: zadatak</p>
-                    <p>Password: zadatak</p>
-                </div>
             </div>
         </div>
     );
