@@ -15,8 +15,9 @@ const Products = ({ onLogout }) => {
         category: '',
         search: ''
     });
+    const [searchInput, setSearchInput] = useState(''); // ✅ Lokalni state za input
     const [categories, setCategories] = useState([]);
-    const [showLogoutMessage, setShowLogoutMessage] = useState(false); // ✅ Dodano za poruku
+    const [showLogoutMessage, setShowLogoutMessage] = useState(false);
        
     const navigate = useNavigate();
 
@@ -50,31 +51,26 @@ const Products = ({ onLogout }) => {
     const handleLogout = () => {
         console.log('🚪 Logout clicked in Products component');
         
-        // ✅ Prikaži poruku za odjavu
         setShowLogoutMessage(true);
         
-        // ✅ Sakrij poruku i izvrši logout nakon 2 sekunde
         setTimeout(() => {
-            // Obriši token direktno ovde takođe (kao backup)
             localStorage.removeItem('token');
             localStorage.removeItem('tokenType');
             
-            // Pozovi onLogout callback da obavestiš App komponentu
             if (onLogout) {
                 console.log('📞 Calling onLogout callback');
                 onLogout();
             } else {
                 console.warn('⚠️ onLogout callback not provided');
-                // Fallback: direktna navigacija
                 navigate('/login', { replace: true });
             }
         }, 2000);
     };
 
-    // Učitaj proizvode kada se komponenta mount-uje ili se filtri promene
+    // ✅ Učitaj proizvode kada se komponenta mount-uje ili se filtri promene
     useEffect(() => {
         fetchProducts();
-    }, [filters]);
+    }, [filters]); // Samo kada se filters promeni, ne searchInput
        
     // Handler za promenu kategorije
     const handleCategoryChange = (e) => {
@@ -84,22 +80,26 @@ const Products = ({ onLogout }) => {
         }));
     };
 
-    // Handler za pretragu
+    // ✅ Handler za pretragu - samo menja lokalni state
     const handleSearchChange = (e) => {
-        setFilters(prev => ({
-            ...prev,
-            search: e.target.value
-        }));
+        setSearchInput(e.target.value);
     };
 
-    // Debounce za pretragu (opciono - da ne šalje zahtev na svaki karakter)
+    // ✅ Debounce za pretragu - čeka 500ms pre slanja zahteva
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            // Ovde možete dodati dodatnu logiku ako je potrebno
-        }, 300);
+            console.log(`🔍 Search debounce: "${searchInput}"`);
+            setFilters(prev => ({
+                ...prev,
+                search: searchInput
+            }));
+        }, 500); // ✅ Čeka 500ms nakon poslednjeg kucanja
                
-        return () => clearTimeout(timeoutId);
-    }, [filters.search]);
+        return () => {
+            console.log('🚫 Clearing search timeout');
+            clearTimeout(timeoutId);
+        };
+    }, [searchInput]); // ✅ Pokreće se kada se searchInput promeni
 
     // Klik na proizvod
     const handleProductClick = (productId) => {
@@ -129,7 +129,7 @@ const Products = ({ onLogout }) => {
 
     return (
         <div className="products-container">
-            {/* ✅ Logout poruka overlay */}
+            {/* Logout poruka overlay */}
             {showLogoutMessage && (
                 <div className="logout-message-overlay">
                     <div className="logout-message">
@@ -176,14 +176,22 @@ const Products = ({ onLogout }) => {
                 </div>
                 <div className="filter-group">
                     <label htmlFor="search">Pretraga:</label>
-                    <input
-                        id="search"
-                        type="text"
-                        value={filters.search}
-                        onChange={handleSearchChange}
-                        placeholder="Pretražite proizvode..."
-                        className="filter-input"
-                    />
+                    <div className="search-input-wrapper">
+                        <input
+                            id="search"
+                            type="text"
+                            value={searchInput} // ✅ Koristi searchInput umesto filters.search
+                            onChange={handleSearchChange}
+                            placeholder="Pretražite proizvode..."
+                            className="filter-input"
+                        />
+                        {/* ✅ Loading indikator za pretragu */}
+                        {searchInput !== filters.search && (
+                            <div className="search-loading">
+                                <div className="search-spinner"></div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -191,6 +199,10 @@ const Products = ({ onLogout }) => {
             <div className="products-results">
                 <p className="results-count">
                     Pronađeno {products.length} proizvoda
+                    {/* ✅ Prikaži trenutni search filter */}
+                    {filters.search && (
+                        <span className="search-info"> za "{filters.search}"</span>
+                    )}
                 </p>
             </div>
 
@@ -230,6 +242,17 @@ const Products = ({ onLogout }) => {
                         </div>
                     ))
                 )}
+            </div>
+
+            {/* Floating logout dugme */}
+            <div className="floating-logout">
+                <button
+                    onClick={handleLogout}
+                    className="floating-logout-btn"
+                    title="Odjavi se"
+                >
+                    ↩️
+                </button>
             </div>
         </div>
     );
