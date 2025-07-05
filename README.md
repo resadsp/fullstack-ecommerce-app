@@ -50,12 +50,27 @@ Razviti potpunu web aplikaciju koja uključuje frontend i sopstveni backend API.
 - ✅ Authorization header sa JWT tokenom
 - ✅ Logout funkcionalnost
 
+#### **Interaktivno Filtriranje i Pretraga:**
+- ✅ **Dropdown filtriranje po kategoriji** - Dinamički dropdown sa svim dostupnim kategorijama
+- ✅ **Real-time pretraga** - Pretraga po nazivu i opisu proizvoda u realnom vremenu
+- ✅ **Kombinovano filtriranje** - Mogućnost kombinovanja kategorije i pretrage
+- ✅ **Brojač rezultata** - Prikaz broja pronađenih proizvoda
+- ✅ **Reset filtara** - Mogućnost brisanja svih filtara
+
+#### **Detalji Proizvoda:**
+- ✅ **Pojedinačni prikaz proizvoda** - Klik na proizvod otvara detaljnu stranicu
+- ✅ **Navigacija nazad** - Povratak na listu proizvoda
+- ✅ **404 handling** - Elegantno rukovanje nepostojećim proizvodima
+- ✅ **Responsive dizajn** - Optimizovano za sve veličine ekrana
+
 ### 🚀 **Naprednije Funkcionalnosti (Dodatni Poeni)**
 - ✅ **Filtriranje po kategoriji** - Dropdown sa kategorijama
 - ✅ **Pretraga po nazivu** - Real-time search
 - ✅ **Detalji proizvoda** - Klik na proizvod za detalje
 - ✅ **Robusno error handling** - Comprehensive error management
 - ✅ **Moderni UI/UX** - Responsive design sa hover efektima
+- ✅ **Loading states** - Indikatori učitavanja za bolje korisničko iskustvo
+- ✅ **Fallback slike** - Automatski fallback za neispravne URL-ove slika
 
 ## 🛠️ Tehnologije
 
@@ -97,7 +112,7 @@ fullstack-ecommerce-app/
 │   │   ├── components/
 │   │   │   ├── Login.js & Login.css
 │   │   │   ├── Products.js & Products.css
-│   │   │   └── ProductDetail.js
+│   │   │   └── ProductDetail.js & ProductDetail.css
 │   │   ├── services/
 │   │   │   └── api.js
 │   │   ├── App.js
@@ -160,10 +175,8 @@ npm start
 Frontend će biti dostupan na: `http://localhost:3000`
 
 ## 🔑 Test Podaci
-
 - **Username:** `zadatak`
 - **Password:** `zadatak`
-
 
 ## 📚 API Dokumentacija
 
@@ -180,8 +193,31 @@ Kada je backend pokrenut, API dokumentacija je dostupna na:
 ### Proizvodi
 - `GET /api/products` - Lista svih obrađenih proizvoda
 - `GET /api/products/{id}` - Detalji specifičnog proizvoda
-- `GET /api/products?category=Monitori` - Filter po kategoriji
+- `GET /api/products?category=Electronics` - Filter po kategoriji
 - `GET /api/products?search=laptop` - Pretraga proizvoda
+- `GET /api/products?category=Electronics&search=laptop` - Kombinovano filtriranje
+
+## 🎮 Frontend Funkcionalnosti
+
+### 🔍 **Napredna Pretraga i Filtriranje**
+- **Kategorije:** Dropdown meni sa svim dostupnim kategorijama proizvoda
+- **Pretraga:** Real-time pretraga kroz naziv i opis proizvoda
+- **Kombinovano:** Mogućnost kombinovanja kategorije i pretrage
+- **Brojač:** Prikaz broja pronađenih rezultata
+- **Reset:** Mogućnost brisanja svih filtara odjednom
+
+### 📱 **Korisničko Iskustvo**
+- **Responsive dizajn:** Optimizovano za desktop, tablet i mobilne uređaje
+- **Loading indikatori:** Jasni indikatori tokom učitavanja podataka
+- **Error handling:** Elegantno rukovanje greškama sa mogućnostima oporavka
+- **Hover efekti:** Interaktivni elementi sa smooth animacijama
+- **Intuitivna navigacija:** Jasna navigacija između stranica
+
+### 🖼️ **Prikaz Proizvoda**
+- **Grid layout:** Responzivni grid sa automatskim prilagođavanjem
+- **Kvalitetne slike:** Optimizovane slike sa fallback opcijama
+- **Detaljan prikaz:** Klik na proizvod otvara detaljnu stranicu
+- **Brza navigacija:** Jednostavan povratak na listu proizvoda
 
 ## 🔄 Obrada Podataka
 
@@ -198,6 +234,8 @@ Kada je backend pokrenut, API dokumentacija je dostupna na:
 - **Hover efekti** na kartice proizvoda
 - **Loading states** i error handling
 - **Intuitivna navigacija** sa jasnim CTA dugmićima
+- **Consistent branding** kroz celu aplikaciju
+- **Accessibility features** za bolje korisničko iskustvo
 
 ## 🛡️ Sigurnost
 
@@ -222,6 +260,14 @@ Kada je backend pokrenut, API dokumentacija je dostupna na:
 - Robusno error handling
 - Poboljšani UI/UX
 
+### ✅ Dodatne Funkcionalnosti - BONUS
+- Real-time pretraga
+- Kombinovano filtriranje
+- Responsive dizajn
+- Loading states
+- Fallback slike
+- Brojač rezultata
+
 ## 🚧 Moguća Proširenja
 
 - [ ] Registracija novih korisnika
@@ -230,6 +276,9 @@ Kada je backend pokrenut, API dokumentacija je dostupna na:
 - [ ] Admin panel za upravljanje
 - [ ] Email notifikacije
 - [ ] Payment integration
+- [ ] Wishlist funkcionalnost
+- [ ] Product reviews i ratings
+- [ ] Advanced sorting opcije
 
 ## 📄 Licenca
 
@@ -238,3 +287,13 @@ Ovaj projekat je razvijen kao odgovor na Junior Fullstack Developer zadatak i ra
 ---
 
 ⭐ **Projekat potpuno ispunjava sve zahteve zadatka + dodatne funkcionalnosti!** ⭐
+
+### 🏆 **Ključne Prednosti:**
+- **Potpuna funkcionalnost** - Sve zahtevane funkcije implementirane
+- **Moderni stack** - React + FastAPI sa best practices
+- **Excellent UX** - Intuitivno i responzivno korisničko iskustvo
+- **Robusno error handling** - Elegantno rukovanje svim edge case-ovima
+- **Scalable architecture** - Čist kod spreman za proširenja
+- **Production ready** - Optimizovano za deployment
+
+---

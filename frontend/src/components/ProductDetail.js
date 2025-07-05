@@ -1,137 +1,142 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { productsAPI } from '../services/api';
+import { useParams, useNavigate } from 'react-router-dom';
+import { api } from '../services/api'; // ✅ Ispravljen import
 import './ProductDetail.css';
 
 const ProductDetail = () => {
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { logout } = useAuth();
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                
+                const data = await api.getProduct(id); // ✅ Koristi api.getProduct
+                setProduct(data);
+                
+            } catch (err) {
+                console.error('Error fetching product:', err);
+                setError(err.message);
+                
+                // Ako je 404, prikaži odgovarajuću poruku
+                if (err.message.includes('not found')) {
+                    setError('Proizvod nije pronađen.');
+                }
+                
+                // Ako je problem sa autentifikacijom
+                if (err.message.includes('authentication') || err.message.includes('401')) {
+                    localStorage.removeItem('token');
+                    navigate('/login');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  const fetchProduct = async () => {
-    try {
-      setLoading(true);
-      const response = await productsAPI.getProduct(id);
-      setProduct(response.data);
-      setError('');
-    } catch (err) {
-      if (err.response?.status === 404) {
-        setError('Proizvod nije pronađen');
-      } else {
-        setError('Greška pri učitavanju proizvoda');
-      }
-      console.error('Product fetch error:', err);
-    } finally {
-      setLoading(false);
+        if (id) {
+            fetchProduct();
+        }
+    }, [id, navigate]);
+
+    const handleBackToProducts = () => {
+        navigate('/products');
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        navigate('/login');
+    };
+
+    if (loading) {
+        return (
+            <div className="product-detail-container">
+                <div className="loading">Učitavanje proizvoda...</div>
+            </div>
+        );
     }
-  };
 
-  const handleLogout = () => {
-    logout();
-  };
-
-  const handleGoBack = () => {
-    navigate('/products');
-  };
-
-  if (loading) {
-    return <div className="loading">Učitavanje proizvoda...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="error-container">
-        <div className="error-message">{error}</div>
-        <button onClick={handleGoBack} className="back-button">
-          Nazad na proizvode
-        </button>
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div className="error-container">
-        <div className="error-message">Proizvod nije pronađen</div>
-        <button onClick={handleGoBack} className="back-button">
-          Nazad na proizvode
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="product-detail-container">
-      <header className="product-detail-header">
-        <div className="header-left">
-          <button onClick={handleGoBack} className="back-button">
-            ← Nazad na proizvode
-          </button>
-        </div>
-        <button onClick={handleLogout} className="logout-button">
-          Odjavi se
-        </button>
-      </header>
-
-      <div className="product-detail-content">
-        <div className="product-image-section">
-          <img 
-            src={product.image_url} 
-            alt={product.name}
-            className="product-detail-image"
-          />
-        </div>
-        
-        <div className="product-info-section">
-          <div className="product-category-badge">
-            {product.category}
-          </div>
-          
-          <h1 className="product-title">{product.name}</h1>
-          
-          <div className="product-price-large">
-            ${product.price.toFixed(2)}
-          </div>
-          
-          <div className="product-description-section">
-            <h3>Opis proizvoda</h3>
-            <p className="product-description-full">
-              {product.description}
-            </p>
-          </div>
-          
-          <div className="product-details-grid">
-            <div className="detail-item">
-              <span className="detail-label">ID proizvoda:</span>
-              <span className="detail-value">{product.id}</span>
+    if (error) {
+        return (
+            <div className="product-detail-container">
+                <div className="error">
+                    <h2>Greška</h2>
+                    <p>{error}</p>
+                    <button onClick={handleBackToProducts} className="back-btn">
+                        Nazad na proizvode
+                    </button>
+                </div>
             </div>
-            <div className="detail-item">
-              <span className="detail-label">Kategorija:</span>
-              <span className="detail-value">{product.category}</span>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className="product-detail-container">
+                <div className="error">
+                    <h2>Proizvod nije pronađen</h2>
+                    <button onClick={handleBackToProducts} className="back-btn">
+                        Nazad na proizvode
+                    </button>
+                </div>
             </div>
-          </div>
-          
-          <div className="product-actions">
-            <button className="add-to-cart-button">
-              Dodaj u korpu
-            </button>
-            <Link to="/products" className="continue-shopping-button">
-              Nastavi kupovinu
-            </Link>
-          </div>
+        );
+    }
+
+    return (
+        <div className="product-detail-container">
+            {/* Header */}
+            <div className="product-detail-header">
+                <button onClick={handleBackToProducts} className="back-btn">
+                    ← Nazad na proizvode
+                </button>
+                <button onClick={handleLogout} className="logout-btn">
+                    Odjavi se
+                </button>
+            </div>
+
+            {/* Product Details */}
+            <div className="product-detail-content">
+                <div className="product-image-section">
+                    <img 
+                        src={product.image_url} 
+                        alt={product.name}
+                        className="product-detail-image"
+                    />
+                </div>
+                
+                <div className="product-info-section">
+                    <div className="product-category-badge">
+                        {product.category}
+                    </div>
+                    
+                    <h1 className="product-title">{product.name}</h1>
+                    
+                    <div className="product-price-section">
+                        <span className="product-price">${product.price}</span>
+                    </div>
+                    
+                    <div className="product-description-section">
+                        <h3>Opis proizvoda</h3>
+                        <p className="product-description">{product.description}</p>
+                    </div>
+                    
+                    <div className="product-actions">
+                        <button className="add-to-cart-btn">
+                            Dodaj u korpu
+                        </button>
+                        <button className="favorite-btn">
+                            ♥ Dodaj u favorite
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default ProductDetail;
