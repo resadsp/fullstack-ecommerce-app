@@ -8,7 +8,7 @@ async def get_current_user_token_optional(authorization: str = Header(None)):
     """Extract token from Authorization header (optional)"""
     if authorization and authorization.startswith("Bearer "):
         return authorization.split(" ")[1]
-    return "anonymous"  # Default za neautentifikovane korisnike
+    return "anonymous"  # Default za neautentifikovane korisnikee
 
 @router.get("/products")
 async def get_products(
