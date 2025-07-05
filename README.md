@@ -209,7 +209,7 @@ Kada je backend pokrenut, API dokumentacija je dostupna na:
 ### 📱 **Korisničko Iskustvo**
 - **Responsive dizajn:** Optimizovano za desktop, tablet i mobilne uređaje
 - **Loading indikatori:** Jasni indikatori tokom učitavanja podataka
-- **Error handling:** Elegantno rukovanje greškama sa mogućnostima oporavka
+- **Error handling:** Elegantno rukovanje greškama sa mogućnostima oporavka od istih
 - **Hover efekti:** Interaktivni elementi sa smooth animacijama
 - **Intuitivna navigacija:** Jasna navigacija između stranica
 
